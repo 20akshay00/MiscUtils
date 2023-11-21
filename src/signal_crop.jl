@@ -21,19 +21,14 @@ begin
 	end
 
 	# measure of signal extent
-	function f(data, anchor, window)
-		@assert length(size(data)) == length(anchor) "Dimension mismatch between anchor and data"
-		
-		ndim = length(anchor)
-		std(data[cube(anchor, window)...])
-	end
+	f(data, anchor, window) = std(data[cube(anchor, window)...])
 
 	# extract (hyper-)cubical ranges for cropping 
 	function crop_extents(data; scale = 5, max_window = 200)
 		anchor = Tuple(argmax(data)) # replace with robust peak finding algorithm 	
-		window = argmax([f(data, anchor, window) for window in 1:max_window]) * scale
+		extent = argmax([f(data, anchor, window) for window in 1:max_window])
 	
-		return cube(anchor, window)
+		return cube(anchor, extent * scale)
 	end
 end
 
